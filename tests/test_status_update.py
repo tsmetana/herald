@@ -16,6 +16,7 @@ from herald.config import (
     DEFAULT_MAX_TOKENS,
     MAX_CONFIGURED_MAX_TOKENS,
     UserPrefs,
+    _cache_key,
     find_scripts_dir,
     find_skills_dir,
     load_prefs,
@@ -252,6 +253,26 @@ project = "TEST"
     assert prefs.jira_url == "https://example.atlassian.net"
     assert prefs.skills_dir == "/custom/skills"
     assert "myprofile" in prefs.profiles
+
+
+def test_cache_key_separates_distinct_custom_jql():
+    base = dict(
+        project=None, component=None, label=None,
+        assignee=None, exclude=None, days=7,
+        start_date=None, end_date=None,
+    )
+    first = _cache_key(argparse.Namespace(jql="project = A", **base))
+    second = _cache_key(argparse.Namespace(jql="project = B", **base))
+    none_jql = _cache_key(argparse.Namespace(jql=None, **base))
+
+    assert len({first, second, none_jql}) == 3
+
+
+def test_cache_key_accepts_jql_only_invocation():
+    """JQL-only runs have project=None; the key must still be derivable."""
+    key = _cache_key(argparse.Namespace(jql="project = A", project=None))
+
+    assert isinstance(key, str) and len(key) == 16
 
 
 def test_load_prefs_partial_fills_defaults(tmp_path):

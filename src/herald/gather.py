@@ -126,10 +126,13 @@ async def run_gather(
     cmd = [
         sys.executable,
         str(scripts_dir / "gather_status_data.py"),
-        "--project", args.project,
         "--output-dir", output_dir,
         "--verbose",
     ]
+    if getattr(args, "project", None):
+        cmd.extend(["--project", args.project])
+    if getattr(args, "jql", None):
+        cmd.extend(["--jql", args.jql])
     if getattr(args, "component", None):
         cmd.extend(["--component", args.component])
     if getattr(args, "label", None):

@@ -25,9 +25,14 @@ Environment variables:
   ANTHROPIC_VERTEX_PROJECT_ID  Use Vertex AI instead of direct API
 """,
     )
-    parser.add_argument("--project", required=True, help="Jira project key (e.g. OCPSTRAT)")
+    parser.add_argument("--project", help="Jira project key (e.g. OCPSTRAT); required unless --jql is given")
     parser.add_argument("--component", help="Filter by component")
     parser.add_argument("--label", help="Filter by label")
+    parser.add_argument(
+        "--jql",
+        help="Custom JQL selecting root issues; used verbatim and overrides "
+             "--project/--component/--label/--assignee/--exclude",
+    )
     parser.add_argument("--assignee", action="append", help="Filter by assignee email (repeatable)")
     parser.add_argument("--exclude", action="append", help="Exclude assignee email (repeatable)")
     parser.add_argument("--days", type=int, default=7, help="Lookback days (default: 7)")
@@ -62,6 +67,9 @@ async def main() -> None:
         for key, value in profile.items():
             if not getattr(args, key, None):
                 setattr(args, key, value)
+
+    if not args.project and not args.jql:
+        parser.error("one of --project or --jql is required")
 
     scripts_dir = find_scripts_dir(prefs)
     app = StatusUpdateApp(args, prefs, scripts_dir)

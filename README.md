@@ -83,6 +83,11 @@ project = "MYPROJ"
 component = "My Component"
 label = "my-label"
 exclude = ["bot@example.com"]
+
+[profiles.my-jql-team]
+# --jql is used verbatim and overrides project/component/label/assignee/exclude,
+# including the gatherer's built-in status filters.
+jql = 'project = MYPROJ AND assignee = "me@example.com" AND cf[10855] = "openshift-5.1" ORDER BY rank ASC'
 ```
 
 ### Reporting rules (status-analysis skill)
@@ -108,6 +113,9 @@ herald --project OCPSTRAT --component "Hosted Control Planes"
 
 # Using a saved profile
 herald --project OCPSTRAT --profile my-team
+
+# Selecting root issues with custom JQL (no --project needed)
+herald --jql 'project = OCPSTRAT AND cf[10855] = "openshift-5.1" ORDER BY rank ASC'
 
 # Force re-gather (ignore cache)
 herald --project OCPSTRAT --refresh

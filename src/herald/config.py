@@ -94,9 +94,10 @@ def _get_cache_dir() -> Path:
 def _cache_key(args) -> str:
     """Deterministic cache key from the gather parameters."""
     parts = [
-        args.project,
+        args.project or "",
         getattr(args, "component", None) or "",
         getattr(args, "label", None) or "",
+        getattr(args, "jql", None) or "",
         ",".join(sorted(getattr(args, "assignee", None) or [])),
         ",".join(sorted(getattr(args, "exclude", None) or [])),
         str(getattr(args, "days", 7)),

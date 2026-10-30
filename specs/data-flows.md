@@ -32,9 +32,16 @@ external status-analysis directory and its `scripts` child.
 
 `run_gather` runs `gather_status_data.py` using Herald's Python interpreter.
 The forwarded parameters are project, output directory, verbose mode, optional
-component and label, repeated assignees/excluded assignees, lookback days,
-optional start/end dates, and optional individual issue keys. The exclude flag
-is translated to `--exclude-assignee`.
+custom JQL, optional component and label, repeated assignees/excluded
+assignees, lookback days, optional start/end dates, and optional individual
+issue keys. The exclude flag is translated to `--exclude-assignee`.
+
+`--jql` is forwarded verbatim to the gatherer, where it replaces the entire
+built-in root-issue query — including the `status != Closed` and
+`status != "Release Pending"` guards. A profile that sets `jql` therefore owns
+its own status filtering, and its `project`, `component`, `label`, `assignee`,
+and `exclude` values have no effect on root selection. Explicit `--issue` keys
+still take precedence over `--jql`. Either `project` or `jql` must be supplied.
 
 The subprocess inherits the environment, including source credentials. The
 exact upstream API queries, pagination, PR matching, and descendant traversal
